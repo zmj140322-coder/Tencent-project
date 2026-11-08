@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#2A2620">
+<meta name="description" content="悦读 · 数字藏书楼 —— 藏书检索、图书借阅、阅览室在线选座与到馆签到。">
+<title>悦读 · 数字藏书楼</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='6' fill='%239E3B32'/%3E%3Ctext x='32' y='46' font-size='42' text-anchor='middle' fill='%23FBF7EE' font-family='serif'%3E悦%3C/text%3E%3C/svg%3E">
+<link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+
+<!-- CodePen 热门粒子组件适配层：宣纸墨尘画布 -->
+<canvas id="ink-canvas" aria-hidden="true"></canvas>
+<div id="ink-wipe" aria-hidden="true"></div>
+
+<div class="site-shell">
+
+  <header class="site-header" id="siteHeader">
+    <div class="header-inner">
+      <a class="brand" href="#/home" aria-label="悦读首页">
+        <span class="brand-seal">悦</span>
+        <span class="brand-text"><strong>悦读</strong><small>YUEDU · LIBRARY</small></span>
+      </a>
+
+      <button class="nav-toggle" id="navToggle" aria-label="展开导航" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+
+      <nav class="main-nav" id="mainNav" aria-label="主导航">
+        <a href="#/home" data-route="home">首页</a>
+        <a href="#/search" data-route="search">藏书检索</a>
+        <a href="#/seat" data-route="seat">阅览选座</a>
+        <a href="#/home" data-action="myloans">我的借阅</a>
+        <a href="#/home" data-action="notices">馆讯</a>
+      </nav>
+
+      <div class="header-meta">
+        <div class="open-info"><span id="todayLabel">—</span><small>开馆 06:30 – 21:30</small></div>
+        <div class="user-chip"><span class="avatar">沈</span><span>沈砚秋</span></div>
+      </div>
+    </div>
+    <div class="header-rule"></div>
+  </header>
+
+  <div class="page-host">
+
+    <!-- ============ 01 首页门户 ============ -->
+    <main class="page is-active" id="page-home" data-page="home">
+
+      <section class="hero">
+        <div class="hero-grain" aria-hidden="true"></div>
+        <div class="hero-inner">
+          <div class="hero-copy">
+            <p class="eyebrow"><i></i>悦读 · 数字藏书楼</p>
+            <h1 class="hero-title"><span>一卷书香，</span><span>一方静席</span></h1>
+            <p class="hero-sub">检索馆藏、办理借阅、预约阅览席位。<br>让每一次到馆，都从容有度。</p>
+            <form class="hero-search" id="heroSearchForm" role="search">
+              <label class="sr-only" for="heroSearchInput">检索书名、作者或索书号</label>
+              <span class="search-icon" aria-hidden="true"></span>
+              <input id="heroSearchInput" type="search" placeholder="检索书名 / 作者 / 索书号" autocomplete="off">
+              <button type="submit">检 索</button>
+            </form>
+            <p class="hero-stats">馆藏 <b>128,460</b> 册 <em>·</em> 今日在馆 <b>1,286</b> 人 <em>·</em> 当前空座 <b id="heroOpenSeats">87</b> 席</p>
+          </div>
+          <div class="hero-visual">
+            <img src="assets/img/hero.jpg" alt="古籍阅览室的雕花木窗、书架与书案" loading="eager">
+            <span class="hero-visual-cap">藏 · 古籍阅览室</span>
+          </div>
+        </div>
+      </section>
+
+      <section class="quick-bar" aria-label="快捷入口">
+        <a class="quick-item" href="#/search"><span class="qi-icon qi-book"></span><span><strong>藏书检索</strong><small>书目 · 全文 · 索书号</small></span></a>
+        <a class="quick-item" href="#/home" data-action="myloans"><span class="qi-icon qi-return"></span><span><strong>借阅归还</strong><small>在借 · 续借 · 逾期办理</small></span></a>
+        <a class="quick-item" href="#/seat"><span class="qi-icon qi-seat"></span><span><strong>阅览选座</strong><small>实时席位 · 在线预约</small></span></a>
+        <a class="quick-item" href="#/home" data-action="checkin"><span class="qi-icon qi-check"></span><span><strong>到馆签到</strong><small>扫码签到 · 预约记录</small></span></a>
+      </section>
+
+      <div class="paper-wrap">
+        <div class="home-grid">
+
+          <div class="home-main">
+            <section class="panel" id="recommendPanel">
+              <div class="panel-head">
+                <h2><i class="tick"></i>馆员荐书 · 推荐书目 <span class="tag">本周由馆员李霁川选编</span></h2>
+                <a class="link-more" href="#/search">查看全部书目 ›</a>
+              </div>
+              <article class="feature-book">
+                <div class="fb-cover"><img src="assets/img/book.jpg" alt="古籍《陶庵梦忆》书影" loading="lazy"></div>
+                <div class="fb-info">
+                  <span class="badge">馆员荐书</span>
+                  <h3>《陶庵梦忆》</h3>
+                  <p class="fb-meta">[明] 张岱 著 · 中华书局 2021 · I264.9/12</p>
+                  <p class="fb-desc">写尽故国风物与人情味的一部笔记小品。适合在半日闲宅，就着雨光慢慢读。</p>
+                  <div class="fb-bottom">
+                    <span class="fb-stock">在架 <b id="featureStock">3</b> / 5 册 <em>·</em> 三楼古籍阅览室</span>
+                    <div class="fb-actions">
+                      <button class="btn btn-primary" data-borrow="b1">借阅此书</button>
+                      <button class="btn btn-ghost" data-wishlist="b1">加入书单</button>
+                    </div>
+                  </div>
+                </div>
+              </article>
+            </section>
+
+            <section class="panel">
+              <div class="panel-head">
+                <h2><i class="tick"></i>荐书榜 · 本周</h2>
+                <span class="panel-note">按馆内借阅热度排序</span>
+              </div>
+              <ol class="rank-list" id="rankList"></ol>
+            </section>
+
+            <section class="panel" id="noticesPanel">
+              <div class="panel-head">
+                <h2><i class="tick"></i>馆讯 · 公告</h2>
+                <span class="link-more" role="button" tabindex="0" data-action="notices">全部公告 ›</span>
+              </div>
+              <ul class="notice-list" id="noticeList"></ul>
+            </section>
+          </div>
+
+          <aside class="home-side">
+            <section class="panel panel-dark" id="forecastPanel">
+              <div class="panel-head dark">
+                <h2>今日空座预测</h2>
+                <span class="live-dot">实时更新</span>
+              </div>
+              <div class="segment" id="forecastSegment" role="tablist">
+                <button data-slot="am">上午</button>
+                <button class="active" data-slot="pm">下午</button>
+                <button data-slot="night">晚间</button>
+              </div>
+              <div class="forecast-num"><strong id="forecastSeats">87</strong><span>席 · 当前可用<br><small>预测 14:00 – 16:00 为今日最宽裕时段</small></span><em>较昨日 +2</em></div>
+              <div class="forecast-chart" id="forecastChart" aria-label="分时段空座预测柱状图"></div>
+              <div class="forecast-axis"><span>09</span><span>11</span><span>13</span><span>15</span><span>17</span><span>19</span><span>21</span></div>
+              <p class="forecast-hint">该时段三层余位预计 30 席以上</p>
+              <a class="btn btn-block btn-primary" href="#/seat">立 即 选 座</a>
+            </section>
+
+            <section class="panel" id="loansPanel">
+              <div class="panel-head">
+                <h2>我的借阅</h2>
+                <span class="panel-note">在借 2 册 · 最多 6 册</span>
+              </div>
+              <ul class="loan-list" id="loanList"></ul>
+            </section>
+
+            <section class="panel" id="checkinPanel">
+              <div class="panel-head">
+                <h2>到馆签到</h2>
+                <span class="tag tag-warn" id="checkinState">今日未签到</span>
+              </div>
+              <div class="checkin-body">
+                <div class="qr-frame" id="qrBox" title="到馆签到码"></div>
+                <div class="checkin-text">
+                  <strong id="checkinTitle">当前无生效预约</strong>
+                  <small id="checkinDesc">预约席位后，此处生成签到码</small>
+                  <button class="btn btn-outline btn-block" data-action="checkin">扫 码 签 到</button>
+                </div>
+              </div>
+            </section>
+          </aside>
+
+        </div>
+      </div>
+    </main>
+
+    <!-- ============ 02 藏书检索与借阅 ============ -->
+    <main class="page" id="page-search" data-page="search">
+      <div class="crumbs"><a href="#/home">首页</a><span>/</span><b>藏书检索</b></div>
+      <section class="search-intro">
+        <div>
+          <h1>藏书检索</h1>
+          <p>共收录 128,460 册 · 支持书名、作者、索书号与主题词检索</p>
+        </div>
+        <div class="intro-links">
+          <button data-action="myloans">归还办理</button><em>·</em>
+          <button data-action="help">检索帮助</button><em>·</em>
+          <button data-action="advanced">高级检索</button>
+        </div>
+      </section>
+      <section class="search-bar-wrap">
+        <form class="big-search" id="searchForm" role="search">
+          <span class="search-icon dark" aria-hidden="true"></span>
+          <label class="sr-only" for="searchInput">输入书名、作者或索书号</label>
+          <input id="searchInput" type="search" placeholder="输入书名 / 作者 / 索书号" autocomplete="off">
+          <label class="sr-only" for="categorySelect">门类</label>
+          <select id="categorySelect"><option>全部门类</option><option>古籍善本</option><option>文 学</option><option>史 地</option><option>艺 术</option></select>
+          <button type="submit" class="btn btn-primary">检 索</button>
+        </form>
+        <div class="hot-words">
+          <span>热门检索：</span>
+          <button data-hot="古籍善本">古籍善本</button>
+          <button data-hot="明清笔记">明清笔记</button>
+          <button data-hot="园林营造">园林营造</button>
+          <button data-hot="版本目录">版本目录</button>
+        </div>
+      </section>
+
+      <div class="result-wrap">
+        <aside class="filter-side">
+          <div class="filter-group">
+            <h3>门 类</h3>
+            <ul id="categoryFilter"></ul>
+          </div>
+          <div class="filter-group">
+            <h3>馆藏地</h3>
+            <ul id="locationFilter"></ul>
+          </div>
+          <div class="filter-group">
+            <h3>借阅状态</h3>
+            <ul id="statusFilter"></ul>
+          </div>
+        </aside>
+
+        <section class="result-main">
+          <div class="result-head">
+            <h2>检索结果 <b id="resultCount">0</b> 条</h2>
+            <div class="result-tools">
+              <label class="sr-only" for="sortSelect">排序方式</label>
+              <select id="sortSelect"><option value="relevance">排序：相关度优先</option><option value="title">排序：书名</option><option value="year">排序：出版年</option></select>
+              <span>每页 10 条</span>
+            </div>
+          </div>
+          <div id="resultList" class="result-list"></div>
+          <div class="pager" id="pager"></div>
+        </section>
+      </div>
+    </main>
+
+    <!-- ============ 03 阅览室选座与签到 ============ -->
+    <main class="page" id="page-seat" data-page="seat">
+      <div class="crumbs"><a href="#/home">首页</a><span>/</span><b>阅览选座</b></div>
+      <section class="search-intro seat-intro">
+        <div>
+          <h1>阅览室选座</h1>
+          <p>实时席位 · 在线预约 · 到馆扫码签到</p>
+        </div>
+        <div class="intro-links">
+          <button data-action="myresv">我的预约</button><em>·</em>
+          <button data-action="checkin">签到记录</button>
+        </div>
+        <div class="date-chip" id="seatDate">—</div>
+      </section>
+
+      <div class="steps" aria-label="预约流程">
+        <span class="step done"><i>一</i>选择时段</span><em></em>
+        <span class="step done"><i>二</i>选择座位</span><em></em>
+        <span class="step"><i>三</i>签到确认</span>
+      </div>
+
+      <div class="seat-layout">
+        <section class="seat-main">
+          <div class="room-tabs" id="roomTabs" role="tablist"></div>
+          <div class="seat-map-card">
+            <div class="window-band"><span>临窗木格 · 光照充足</span></div>
+            <div class="seat-grid" id="seatGrid"></div>
+            <div class="seat-legend">
+              <span><i class="lg lg-free"></i>可选席位</span>
+              <span><i class="lg lg-taken"></i>已被占用</span>
+              <span><i class="lg lg-picked"></i>本次已选</span>
+              <span><i class="lg lg-fav"></i>历史常用</span>
+            </div>
+          </div>
+        </section>
+
+        <aside class="side-card">
+          <h2>预约信息</h2>
+          <dl class="resv-info">
+            <div><dt>预约时段</dt><dd id="infoSlot">14:00 – 17:00</dd></div>
+            <div><dt>阅览区域</dt><dd id="infoRoom">三层古籍阅览室</dd></div>
+            <div><dt>选择席位</dt><dd id="infoSeats">未选择</dd></div>
+            <div><dt>预约时长</dt><dd>3 小时 · 可提前 30 分钟签到</dd></div>
+          </dl>
+          <div class="resv-tip"><strong>空座预测</strong><span id="resvTip">14:00 – 16:00 为今日最宽裕时段<br>该时段三层余位预计 30 席以上</span></div>
+          <button class="btn btn-primary btn-block" id="confirmResv" disabled>确 认 预 约</button>
+          <p class="resv-foot">到馆后请于 15 分钟内扫码签到，逾期席位将自动释放。</p>
+        </aside>
+      </div>
+    </main>
+
+  </div>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <div class="footer-brand">
+        <strong>悦读 · 数字藏书楼</strong>
+        <span>藏书之雅 · 阅读之静</span>
+        <small>馆址：文澜路 27 号 · 二层为古籍阅览室</small>
+      </div>
+      <div class="footer-col"><h4>服务</h4><a href="#/search">馆藏检索</a><a href="#/home" data-action="myloans">借阅归还</a><a href="#/seat">阅览选座</a><a href="#/home" data-action="checkin">到馆签到</a></div>
+      <div class="footer-col"><h4>帮助</h4><a href="#/home" data-action="help">借阅规则</a><a href="#/home" data-action="help">检索指南</a><a href="#/home" data-action="help">预约须知</a><a href="#/home" data-action="help">意见反馈</a></div>
+      <div class="footer-seal" aria-hidden="true">讀</div>
+    </div>
+    <div class="footer-bottom">
+      <span>2026 悦读数字藏书楼 · 馆刊存真</span>
+      <span>开馆 06:30 – 21:30 <em>|</em> 服务热线 0571-8862 4173</span>
+      <span class="db-status" id="dbStatus" title="数据源状态">数据源连接中…</span>
+    </div>
+  </footer>
+</div>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<div class="modal" id="modal" aria-hidden="true">
+  <div class="modal-mask" data-close></div>
+  <div class="modal-box" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <button class="modal-close" data-close aria-label="关闭">×</button>
+    <h3 id="modalTitle">提示</h3>
+    <div id="modalBody"></div>
+  </div>
+</div>
+
+<script src="assets/js/db.js"></script>
+<script src="assets/js/effects.js"></script>
+<script src="assets/js/app.js"></script>
+</body>
+</html>
